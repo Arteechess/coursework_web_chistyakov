@@ -47,12 +47,17 @@ class Favorite(models.Model):
     class Meta:
         unique_together = ('user', 'movie')  # Пользователь может добавить фильм в избранное только один раз
 
+    def __str__(self):
+        return f"Пользователь {self.user} добавил в избранное фильм {self.movie}"
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
     score = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # Рейтинг от 1 до 5
     rated_at = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         unique_together = ('user', 'movie')  # Пользователь может поставить один рейтинг на один фильм
+        
+    def __str__(self):
+        return f"Пользователь {self.user} поставил оценку {self.score} на фильм {self.movie}"
