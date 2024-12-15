@@ -8,7 +8,8 @@ from .pagination import CustomPagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -22,7 +23,11 @@ class GenreViewSet(viewsets.ModelViewSet):
 class MovieViewSet(ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['release_date', 'created_by', 'genres__name']  # Поля для фильтрации
+    search_fields = ['title', 'description']  # Поля для поиска
+    ordering_fields = ['release_date', 'title']  # Поля для сортировки
+
     @action(methods=['GET'], detail=False)
     def filter_by_genre(self, request):
         genre_name = request.query_params.get('genre', None)
@@ -34,6 +39,7 @@ class MovieViewSet(ModelViewSet):
         
         serializer = MovieSerializer(movies, many=True)
         return Response(serializer.data)
+
     @action(methods=['POST'], detail=True)
     def add_to_favorites(self, request, pk=None):
         user = request.user  # Текущий пользователь
@@ -47,7 +53,6 @@ class MovieViewSet(ModelViewSet):
         favorite = Favorite.objects.create(user=user, movie=movie)
         serializer = FavoriteSerializer(favorite)
         return Response(serializer.data, status=201)
-
 
 class FavoriteViewSet(viewsets.ModelViewSet):
     queryset = Favorite.objects.all()

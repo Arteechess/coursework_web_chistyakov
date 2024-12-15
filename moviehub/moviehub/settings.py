@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'simple_history',
     'import_export',
-
+    'django_filters',
 
 
 ]
