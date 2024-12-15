@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from simple_history.models import HistoricalRecords
+
 
 
 class User(AbstractUser):
@@ -34,6 +36,7 @@ class Movie(models.Model):
     release_date = models.DateField()
     genres = models.ManyToManyField(Genre, related_name='movies')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='movies')
+    history = HistoricalRecords()  # Добавляем отслеживание истории
 
     def __str__(self):
         return self.title
@@ -43,6 +46,7 @@ class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favorited_by')
     added_at = models.DateTimeField(auto_now_add=True)
+    history = HistoricalRecords()  # Добавляем отслеживание истории
 
     class Meta:
         unique_together = ('user', 'movie')  # Пользователь может добавить фильм в избранное только один раз
@@ -55,7 +59,8 @@ class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
     score = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # Рейтинг от 1 до 5
     rated_at = models.DateTimeField(auto_now_add=True)
-    
+    history = HistoricalRecords()  # Добавляем отслеживание истории
+
     class Meta:
         unique_together = ('user', 'movie')  # Пользователь может поставить один рейтинг на один фильм
         
