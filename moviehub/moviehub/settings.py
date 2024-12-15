@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'movies',
     'rest_framework.authtoken',
     'simple_history',
+    'import_export',
+
 
 
 ]
