@@ -1,7 +1,5 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-
+from django.db import models
 
 
 class User(AbstractUser):
@@ -22,6 +20,7 @@ class User(AbstractUser):
         blank=True,
     )
 
+
 class Genre(models.Model):
     name = models.CharField(max_length=100)
 
@@ -38,3 +37,22 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favorited_by')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'movie')  # Пользователь может добавить фильм в избранное только один раз
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
+    score = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # Рейтинг от 1 до 5
+    rated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'movie')  # Пользователь может поставить один рейтинг на один фильм
